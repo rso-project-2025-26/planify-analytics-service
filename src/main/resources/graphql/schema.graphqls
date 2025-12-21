@@ -1,0 +1,46 @@
+type Query {
+    # Event Metrics Queries
+    eventMetrics(eventId: ID!): EventMetrics
+    eventMetricsByOrganization(organizationId: ID!): [EventMetrics!]!
+    activeEventsCount: Int!
+    
+    # User Activity Queries
+    userActivities(userId: ID!): [UserActivity!]!
+    eventActivities(eventId: ID!): [UserActivity!]!
+    
+    # System Metrics Queries
+    systemMetrics(metricName: String!): [SystemMetric!]!
+}
+
+type EventMetrics {
+    id: ID!
+    eventId: ID!
+    organizationId: ID!
+    eventTitle: String!
+    eventDate: String!
+    eventStatus: String
+    totalInvites: Int!
+    rsvpAccepted: Int!
+    rsvpDeclined: Int!
+    rsvpMaybe: Int!
+    checkedIn: Int!
+    createdAt: String!
+    updatedAt: String!
+}
+
+type UserActivity {
+    id: ID!
+    userId: ID!
+    eventId: ID!
+    activityType: String!
+    activityTimestamp: String!
+    createdAt: String!
+}
+
+type SystemMetric {
+    id: ID!
+    metricName: String!
+    metricValue: Float!
+    metricTimestamp: String!
+    createdAt: String!
+}
