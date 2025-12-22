@@ -2,7 +2,7 @@ name: Analytics Service - CI/CD
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, dev, feature/service-core]
 
 env:
   REGISTRY: ghcr.io
@@ -45,7 +45,7 @@ jobs:
     name: Build Docker Image
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/feature/service-core')
     permissions:
       contents: read
       packages: write
@@ -109,7 +109,7 @@ jobs:
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
-          
+
       - name: Create Kubernetes Secrets
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
