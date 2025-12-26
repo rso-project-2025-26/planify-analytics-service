@@ -26,7 +26,7 @@ public class AnalyticsService {
     
     // Event Handlers
     @Transactional
-    public void handleEventCreated(Long eventId, UUID organizationId, String title, LocalDateTime eventDate, String status) {
+    public void handleEventCreated(UUID eventId, UUID organizationId, String title, LocalDateTime eventDate, String status) {
         EventMetrics metrics = new EventMetrics();
         metrics.setEventId(eventId);
         metrics.setOrganizationId(organizationId);
@@ -42,7 +42,7 @@ public class AnalyticsService {
     }
     
     @Transactional
-    public void handleEventUpdated(Long eventId) {
+    public void handleEventUpdated(UUID eventId) {
         eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
             metrics.setUpdatedAt(LocalDateTime.now());
             eventMetricsRepository.save(metrics);
@@ -51,7 +51,7 @@ public class AnalyticsService {
     }
     
     @Transactional
-    public void handleEventDeleted(Long eventId) {
+    public void handleEventDeleted(UUID eventId) {
         eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
             eventMetricsRepository.delete(metrics);
             log.info("Deleted event metrics for event: {}", eventId);
@@ -62,7 +62,7 @@ public class AnalyticsService {
     }
     
     @Transactional
-    public void handleGuestInvited(Long eventId, UUID userId) {
+    public void handleGuestInvited(UUID eventId, UUID userId) {
         eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
             metrics.setTotalInvites(metrics.getTotalInvites() + 1);
             eventMetricsRepository.save(metrics);
@@ -74,7 +74,7 @@ public class AnalyticsService {
     }
     
     @Transactional
-    public void handleRsvpAccepted(Long eventId, UUID userId) {
+    public void handleRsvpAccepted(UUID eventId, UUID userId) {
         eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
             metrics.setRsvpAccepted(metrics.getRsvpAccepted() + 1);
             eventMetricsRepository.save(metrics);
@@ -89,7 +89,7 @@ public class AnalyticsService {
     }
     
     @Transactional
-    public void handleRsvpDeclined(Long eventId, UUID userId) {
+    public void handleRsvpDeclined(UUID eventId, UUID userId) {
         eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
             metrics.setRsvpDeclined(metrics.getRsvpDeclined() + 1);
             eventMetricsRepository.save(metrics);
@@ -101,7 +101,7 @@ public class AnalyticsService {
     }
     
     @Transactional
-    public void handleGuestCheckedIn(Long eventId, UUID userId) {
+    public void handleGuestCheckedIn(UUID eventId, UUID userId) {
         eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
             metrics.setCheckedIn(metrics.getCheckedIn() + 1);
             eventMetricsRepository.save(metrics);
@@ -113,7 +113,7 @@ public class AnalyticsService {
     }
     
     // Query Methods for GraphQL
-    public EventMetrics getEventMetrics(Long eventId) {
+    public EventMetrics getEventMetrics(UUID eventId) {
         return eventMetricsRepository.findByEventId(eventId)
                 .orElseThrow(() -> new RuntimeException("Event metrics not found for event: " + eventId));
     }
@@ -126,7 +126,7 @@ public class AnalyticsService {
         return userActivityRepository.findByUserId(userId);
     }
     
-    public List<UserActivity> getEventActivities(Long eventId) {
+    public List<UserActivity> getEventActivities(UUID eventId) {
         return userActivityRepository.findByEventId(eventId);
     }
     
@@ -139,7 +139,7 @@ public class AnalyticsService {
     }
     
     // Helper Methods
-    private void recordUserActivity(UUID userId, Long eventId, String activityType) {
+    private void recordUserActivity(UUID userId, UUID eventId, String activityType) {
         UserActivity activity = new UserActivity();
         activity.setUserId(userId);
         activity.setEventId(eventId);

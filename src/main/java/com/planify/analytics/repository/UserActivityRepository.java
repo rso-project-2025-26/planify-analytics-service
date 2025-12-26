@@ -14,7 +14,7 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Long
     
     List<UserActivity> findByUserId(UUID userId);
     
-    List<UserActivity> findByEventId(Long eventId);
+    List<UserActivity> findByEventId(UUID eventId);
     
     List<UserActivity> findByActivityType(String activityType);
     
@@ -22,7 +22,7 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, Long
     List<UserActivity> findRecentActivityByUser(UUID userId, LocalDateTime startDate);
     
     @Query("SELECT ua FROM UserActivity ua WHERE ua.eventId = :eventId AND ua.activityType = :activityType")
-    List<UserActivity> findByEventIdAndActivityType(Long eventId, String activityType);
+    List<UserActivity> findByEventIdAndActivityType(UUID eventId, String activityType);
     
     @Query("SELECT COUNT(ua) FROM UserActivity ua WHERE ua.activityTimestamp >= :startDate")
     Long countRecentActivities(LocalDateTime startDate);

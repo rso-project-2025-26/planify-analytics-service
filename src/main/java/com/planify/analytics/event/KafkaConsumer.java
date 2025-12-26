@@ -25,7 +25,7 @@ public class KafkaConsumer {
         
         try {
             JsonNode json = objectMapper.readTree(message);
-            Long eventId = json.get("eventId").asLong();
+            UUID eventId = UUID.fromString(json.get("eventId").asText());
             UUID organizationId = UUID.fromString(json.get("organizationId").asText());
             String title = json.get("title").asText();
             String eventDate = json.get("eventDate").asText();
@@ -43,7 +43,7 @@ public class KafkaConsumer {
         
         try {
             JsonNode json = objectMapper.readTree(message);
-            Long eventId = json.get("eventId").asLong();
+            UUID eventId = UUID.fromString(json.get("eventId").asText());
             
             analyticsService.handleEventUpdated(eventId);
         } catch (Exception e) {
@@ -57,7 +57,7 @@ public class KafkaConsumer {
         
         try {
             JsonNode json = objectMapper.readTree(message);
-            Long eventId = json.get("eventId").asLong();
+            UUID eventId = UUID.fromString(json.get("eventId").asText());
             
             analyticsService.handleEventDeleted(eventId);
         } catch (Exception e) {
@@ -71,7 +71,7 @@ public class KafkaConsumer {
         
         try {
             JsonNode json = objectMapper.readTree(message);
-            Long eventId = json.get("eventId").asLong();
+            UUID eventId = UUID.fromString(json.get("eventId").asText());
             UUID userId = UUID.fromString(json.get("userId").asText());
             
             analyticsService.handleGuestInvited(eventId, userId);
@@ -86,7 +86,7 @@ public class KafkaConsumer {
         
         try {
             JsonNode json = objectMapper.readTree(message);
-            Long eventId = json.get("eventId").asLong();
+            UUID eventId = UUID.fromString(json.get("eventId").asText());
             UUID userId = UUID.fromString(json.get("userId").asText());
             
             analyticsService.handleRsvpAccepted(eventId, userId);
@@ -101,7 +101,7 @@ public class KafkaConsumer {
         
         try {
             JsonNode json = objectMapper.readTree(message);
-            Long eventId = json.get("eventId").asLong();
+            UUID eventId = UUID.fromString(json.get("eventId").asText());
             UUID userId = UUID.fromString(json.get("userId").asText());
             
             analyticsService.handleRsvpDeclined(eventId, userId);
@@ -116,7 +116,7 @@ public class KafkaConsumer {
         
         try {
             JsonNode json = objectMapper.readTree(message);
-            Long eventId = json.get("eventId").asLong();
+            UUID eventId = UUID.fromString(json.get("eventId").asText());
             UUID userId = UUID.fromString(json.get("userId").asText());
             
             analyticsService.handleGuestCheckedIn(eventId, userId);

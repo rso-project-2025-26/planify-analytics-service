@@ -21,7 +21,7 @@ public class GraphQLResolver {
     // Event Metrics Queries
     @QueryMapping
     public EventMetrics eventMetrics(@Argument String eventId) {
-        return analyticsService.getEventMetrics(Long.parseLong(eventId));
+        return analyticsService.getEventMetrics(UUID.fromString(eventId));
     }
     
     @QueryMapping
@@ -42,7 +42,7 @@ public class GraphQLResolver {
     
     @QueryMapping
     public List<UserActivity> eventActivities(@Argument String eventId) {
-        return analyticsService.getEventActivities(Long.parseLong(eventId));
+        return analyticsService.getEventActivities(UUID.fromString(eventId));
     }
     
     // System Metrics Queries

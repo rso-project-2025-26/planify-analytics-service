@@ -20,7 +20,7 @@ public class EventMetrics {
     private Long id;
     
     @Column(name = "event_id", nullable = false, unique = true)
-    private Long eventId;
+    private UUID eventId;
     
     @Column(name = "organization_id", nullable = false)
     private UUID organizationId;

@@ -24,7 +24,7 @@ public class AnalyticsController {
     
     @GetMapping("/events/{eventId}")
     @Operation(summary = "Get event metrics by event ID")
-    public ResponseEntity<EventMetrics> getEventMetrics(@PathVariable Long eventId) {
+    public ResponseEntity<EventMetrics> getEventMetrics(@PathVariable UUID eventId) {
         log.info("Getting metrics for event: {}", eventId);
         return ResponseEntity.ok(analyticsService.getEventMetrics(eventId));
     }
@@ -45,7 +45,7 @@ public class AnalyticsController {
     
     @GetMapping("/events/{eventId}/activities")
     @Operation(summary = "Get all activities for an event")
-    public ResponseEntity<List<UserActivity>> getEventActivities(@PathVariable Long eventId) {
+    public ResponseEntity<List<UserActivity>> getEventActivities(@PathVariable UUID eventId) {
         log.info("Getting activities for event: {}", eventId);
         return ResponseEntity.ok(analyticsService.getEventActivities(eventId));
     }

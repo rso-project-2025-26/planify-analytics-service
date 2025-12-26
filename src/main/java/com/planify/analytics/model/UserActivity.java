@@ -23,7 +23,7 @@ public class UserActivity {
     private UUID userId;
     
     @Column(name = "event_id", nullable = false)
-    private Long eventId;
+    private UUID eventId;
     
     @Column(name = "activity_type", nullable = false, length = 50)
     private String activityType;

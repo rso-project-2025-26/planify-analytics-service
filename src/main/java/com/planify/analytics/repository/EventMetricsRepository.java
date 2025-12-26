@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface EventMetricsRepository extends JpaRepository<EventMetrics, Long> {
     
-    Optional<EventMetrics> findByEventId(Long eventId);
+    Optional<EventMetrics> findByEventId(UUID eventId);
     
     List<EventMetrics> findByOrganizationId(UUID organizationId);
     
