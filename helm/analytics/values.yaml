@@ -36,29 +36,23 @@ probes:
     failureThreshold: 3
 
 config:
+  springProfilesActive: prod
+  
   serverPort: "8084"
   database:
     url: "jdbc:postgresql://postgres-service:5432/planify"
     schema: "analytics"
-    poolSize: "10"
-    poolMinIdle: "5"
-    connTimeout: "30000"
-  jpa:
-    ddlAuto: "validate"
-    showSql: "false"
   kafka:
     bootstrapServers: "kafka-service:9092"
     consumerGroup: "analytics-service"
-    autoOffsetReset: "earliest"
-  flyway:
-    enabled: "true"
-  swagger:
-    enabled: "true"
+  
+  jpa:
+    showSql: "false"
   graphql:
-    enabled: "true"
-    graphiqlEnabled: "true"
+    graphiqlEnabled: "false"
+  management:
+    endpointsInclude: "health,prometheus,info,metrics"
   logging:
-    levelRoot: "INFO"
+    levelRoot: "WARN"
     levelApp: "INFO"
     levelSpringWeb: "WARN"
-  springProfilesActive: "prod"

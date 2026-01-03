@@ -1,0 +1,13 @@
+config:
+  springProfilesActive: prod
+  jpa:
+    showSql: "false"
+  graphql:
+    graphiqlEnabled: "false"  
+  management:
+    endpointsInclude: "health,prometheus,info,metrics"
+  
+  logging:
+    levelRoot: "WARN"
+    levelApp: "INFO"
+    levelSpringWeb: "WARN"
