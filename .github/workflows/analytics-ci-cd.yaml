@@ -109,32 +109,21 @@ jobs:
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
-
-      - name: Create Kubernetes Secrets
-        run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            NAMESPACE="planify-main"
-          else
-            NAMESPACE="planify-dev"
-          fi
-          
-          kubectl create secret generic analytics-service-secrets \
-            --from-literal=SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} \
-            --from-literal=SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            --namespace ${NAMESPACE} \
-            --dry-run=client -o yaml | kubectl apply -f -
-        
       - run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             NAMESPACE="planify-main"
+            VALUES_FILE="values-prod.yaml"
           else
             NAMESPACE="planify-dev"
+            VALUES_FILE="values-dev.yaml"
           fi
 
           IMAGE_TAG=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
 
           helm upgrade --install analytics ./helm/analytics \
             --namespace ${NAMESPACE} \
+            --values ./helm/analytics/values.yaml \
+            --values ./helm/analytics/${VALUES_FILE} \
             --set image.tag=${IMAGE_TAG} \
             --create-namespace \
             --wait \
