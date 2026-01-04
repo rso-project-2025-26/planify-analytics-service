@@ -6,6 +6,9 @@ import com.planify.analytics.model.UserActivity;
 import com.planify.analytics.repository.EventMetricsRepository;
 import com.planify.analytics.repository.SystemMetricsRepository;
 import com.planify.analytics.repository.UserActivityRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,9 @@ public class AnalyticsService {
     
     // Event Handlers
     @Transactional
+    @Retry(name = "analyticsDatabase")
+    @Bulkhead(name = "analyticsDatabase")
+    @CircuitBreaker(name = "analyticsDatabase", fallbackMethod = "handleEventCreatedFallback")
     public void handleEventCreated(UUID eventId, UUID organizationId, String title, LocalDateTime eventDate, String status) {
         EventMetrics metrics = new EventMetrics();
         metrics.setEventId(eventId);
@@ -41,13 +47,23 @@ public class AnalyticsService {
         updateSystemMetric("TOTAL_EVENTS", (double) eventMetricsRepository.count());
     }
     
+    private void handleEventCreatedFallback(UUID eventId, UUID organizationId, String title, LocalDateTime eventDate, String status, Exception ex) {
+        log.error("Failed to record event metrics for event {}. Error: {}", eventId, ex.getMessage());
+    }
+    
     @Transactional
+    @Retry(name = "analyticsDatabase")
+    @CircuitBreaker(name = "analyticsDatabase", fallbackMethod = "handleEventUpdatedFallback")
     public void handleEventUpdated(UUID eventId) {
         eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
             metrics.setUpdatedAt(LocalDateTime.now());
             eventMetricsRepository.save(metrics);
             log.info("Updated event metrics for event: {}", eventId);
         });
+    }
+    
+    private void handleEventUpdatedFallback(UUID eventId, Exception ex) {
+        log.error("Failed to update event metrics for event {}. Error: {}", eventId, ex.getMessage());
     }
     
     @Transactional
@@ -74,6 +90,9 @@ public class AnalyticsService {
     }
     
     @Transactional
+    @Retry(name = "analyticsDatabase")
+    @Bulkhead(name = "analyticsDatabase")
+    @CircuitBreaker(name = "analyticsDatabase", fallbackMethod = "handleRsvpAcceptedFallback")
     public void handleRsvpAccepted(UUID eventId, UUID userId) {
         eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
             metrics.setRsvpAccepted(metrics.getRsvpAccepted() + 1);
@@ -86,6 +105,10 @@ public class AnalyticsService {
         
         // Update system metrics
         updateSystemMetric("TOTAL_RSVPS", (double) userActivityRepository.count());
+    }
+    
+    private void handleRsvpAcceptedFallback(UUID eventId, UUID userId, Exception ex) {
+        log.error("Failed to record RSVP accepted for event {}. Error: {}", eventId, ex.getMessage());
     }
     
     @Transactional
