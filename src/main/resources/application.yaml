@@ -61,3 +61,73 @@ logging:
     root: ${LOG_LEVEL_ROOT:INFO}
     com.planify: ${LOG_LEVEL_APP:DEBUG}
     org.springframework.web: ${LOG_LEVEL_SPRING_WEB:INFO}
+    io.github.resilience4j: DEBUG
+
+# Resilience4j Configuration for Fault Tolerance
+resilience4j:
+  circuitbreaker:
+    instances:
+      analyticsDatabase:
+        registerHealthIndicator: true
+        slidingWindowSize: 20
+        minimumNumberOfCalls: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 20s
+        failureRateThreshold: 60
+        eventConsumerBufferSize: 10
+        recordExceptions:
+          - java.lang.Exception
+          - java.lang.RuntimeException
+          - org.springframework.dao.DataAccessException
+          - org.springframework.transaction.TransactionException
+          - java.sql.SQLException
+      defaultCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 100
+        minimumNumberOfCalls: 10
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+
+  retry:
+    instances:
+      analyticsDatabase:
+        maxAttempts: 3
+        waitDuration: 1s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+        retryExceptions:
+          - java.lang.Exception
+          - java.lang.RuntimeException
+          - org.springframework.dao.DataAccessException
+          - org.springframework.transaction.TransactionException
+          - java.sql.SQLException
+      defaultRetry:
+        maxAttempts: 3
+        waitDuration: 500ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+
+  bulkhead:
+    instances:
+      analyticsDatabase:
+        maxConcurrentCalls: 10
+        maxWaitDuration: 5s
+      defaultBulkhead:
+        maxConcurrentCalls: 25
+        maxWaitDuration: 0
+
+  ratelimiter:
+    instances:
+      defaultRateLimiter:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0
+
+  timelimiter:
+    instances:
+      defaultTimeLimiter:
+        timeoutDuration: 3s
