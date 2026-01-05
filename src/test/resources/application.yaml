@@ -2,36 +2,18 @@ spring:
   application:
     name: analytics-service-test
 
-  # Disable DataSource auto-configuration for tests
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 
-  # Kafka test configuration
   kafka:
     consumer:
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
       auto-offset-reset: earliest
       group-id: test-group
-      bootstrap-servers: ${spring.embedded.kafka.brokers}
     producer:
       bootstrap-servers: ${spring.embedded.kafka.brokers}
 
-  # Disable Flyway for tests
   flyway:
     enabled: false
-
-  # Disable GraphQL for tests
-  graphql:
-    schema:
-      printer:
-        enabled: false
-
-# Logging for tests
-logging:
-  level:
-    root: WARN
-    com.planify: DEBUG
-    org.springframework.kafka: WARN
-    org.apache.kafka: WARN
-    kafka: WARN
