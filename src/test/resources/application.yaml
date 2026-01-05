@@ -1,136 +1,37 @@
-server:
-  port: ${SERVER_PORT:8084}
-
 spring:
   application:
-    name: analytics-service
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/planify}
-    username: ${SPRING_DATASOURCE_USERNAME:planify}
-    password: ${SPRING_DATASOURCE_PASSWORD:planify}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 30000
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: true
-        default_schema: ${DB_SCHEMA:analytics}
-    show-sql: ${JPA_SHOW_SQL:false}
+    name: analytics-service-test
+
+  # Disable DataSource auto-configuration for tests
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  # Kafka test configuration
   kafka:
     consumer:
       auto-offset-reset: earliest
       group-id: test-group
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
     producer:
-      retries: 0
-    autoconfigure:
-      exclude:
-        - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-        - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
+
+  # Disable Flyway for tests
   flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-    schemas: ${DB_SCHEMA:analytics}
-    default-schema: ${DB_SCHEMA:analytics}
-    create-schema: true
+    enabled: false
+
+  # Disable GraphQL for tests
   graphql:
-    path: /graphql
-    graphiql:
-      enabled: ${GRAPHQL_GRAPHIQL_ENABLED:true}
-      path: /graphiql
+    schema:
+      printer:
+        enabled: false
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: ${MANAGEMENT_ENDPOINTS_INCLUDE:health,prometheus,info,metrics}
-  endpoint:
-    health:
-      show-details: always
-      probes:
-        enabled: true
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-
+# Logging for tests
 logging:
   level:
-    root: ${LOG_LEVEL_ROOT:INFO}
-    com.planify: ${LOG_LEVEL_APP:DEBUG}
-    org.springframework.web: ${LOG_LEVEL_SPRING_WEB:INFO}
-    io.github.resilience4j: DEBUG
-
-# Resilience4j Configuration for Fault Tolerance
-resilience4j:
-  circuitbreaker:
-    instances:
-      analyticsDatabase:
-        registerHealthIndicator: true
-        slidingWindowSize: 20
-        minimumNumberOfCalls: 10
-        permittedNumberOfCallsInHalfOpenState: 3
-        automaticTransitionFromOpenToHalfOpenEnabled: true
-        waitDurationInOpenState: 20s
-        failureRateThreshold: 60
-        eventConsumerBufferSize: 10
-        recordExceptions:
-          - java.lang.Exception
-          - java.lang.RuntimeException
-          - org.springframework.dao.DataAccessException
-          - org.springframework.transaction.TransactionException
-          - java.sql.SQLException
-      defaultCircuitBreaker:
-        registerHealthIndicator: true
-        slidingWindowSize: 100
-        minimumNumberOfCalls: 10
-        permittedNumberOfCallsInHalfOpenState: 3
-        automaticTransitionFromOpenToHalfOpenEnabled: true
-        waitDurationInOpenState: 5s
-        failureRateThreshold: 50
-        eventConsumerBufferSize: 10
-
-  retry:
-    instances:
-      analyticsDatabase:
-        maxAttempts: 3
-        waitDuration: 1s
-        enableExponentialBackoff: true
-        exponentialBackoffMultiplier: 2
-        retryExceptions:
-          - java.lang.Exception
-          - java.lang.RuntimeException
-          - org.springframework.dao.DataAccessException
-          - org.springframework.transaction.TransactionException
-          - java.sql.SQLException
-      defaultRetry:
-        maxAttempts: 3
-        waitDuration: 500ms
-        enableExponentialBackoff: true
-        exponentialBackoffMultiplier: 2
-
-  bulkhead:
-    instances:
-      analyticsDatabase:
-        maxConcurrentCalls: 10
-        maxWaitDuration: 5s
-      defaultBulkhead:
-        maxConcurrentCalls: 25
-        maxWaitDuration: 0
-
-  ratelimiter:
-    instances:
-      defaultRateLimiter:
-        limitForPeriod: 100
-        limitRefreshPeriod: 1s
-        timeoutDuration: 0
-
-  timelimiter:
-    instances:
-      defaultTimeLimiter:
-        timeoutDuration: 3s
+    root: WARN
+    com.planify: DEBUG
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+    kafka: WARN

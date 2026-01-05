@@ -9,10 +9,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
@@ -45,7 +43,11 @@ import static org.mockito.Mockito.verify;
         "port=9092"
     }
 )
-@Profile("test")
+@TestPropertySource(properties = {
+        "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}",
+        "spring.kafka.consumer.auto-offset-reset=earliest",
+        "spring.kafka.consumer.group-id=test-group"
+})
 class KafkaConsumerIntegrationTest {
     
     @Autowired
