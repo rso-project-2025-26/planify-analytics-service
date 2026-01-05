@@ -8,10 +8,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,11 +21,11 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @EnableAutoConfiguration(exclude = {
     DataSourceAutoConfiguration.class,
     HibernateJpaAutoConfiguration.class
 })
-@DirtiesContext
 @EmbeddedKafka(
     partitions = 1,
     topics = {
@@ -43,17 +42,12 @@ import static org.mockito.Mockito.verify;
         "port=9092"
     }
 )
-@TestPropertySource(properties = {
-        "spring.kafka.consumer.bootstrap-servers=${spring.embedded.kafka.brokers}",
-        "spring.kafka.consumer.auto-offset-reset=earliest",
-        "spring.kafka.consumer.group-id=test-group"
-})
 class KafkaConsumerIntegrationTest {
     
     @Autowired
     private KafkaConsumer kafkaConsumer;
     
-    @MockBean
+    @MockitoBean
     private AnalyticsService analyticsService;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -67,8 +61,7 @@ class KafkaConsumerIntegrationTest {
             "{\"eventId\":\"%s\",\"organizationId\":\"%s\",\"title\":\"Test Event\",\"eventDate\":\"2026-01-15T10:00:00\",\"status\":\"DRAFT\"}",
             eventId, organizationId
         );
-        
-        // When
+
         kafkaConsumer.consumeEventCreated(message);
         
         // Then
