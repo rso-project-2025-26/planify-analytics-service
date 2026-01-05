@@ -56,3 +56,8 @@ config:
     levelRoot: "WARN"
     levelApp: "INFO"
     levelSpringWeb: "WARN"
+  swagger:
+    enabled: "false"
+
+  context:
+    path: "/analytics-service"
