@@ -58,6 +58,3 @@ config:
     levelSpringWeb: "WARN"
   swagger:
     enabled: "false"
-
-  context:
-    path: "/analytics-service"
