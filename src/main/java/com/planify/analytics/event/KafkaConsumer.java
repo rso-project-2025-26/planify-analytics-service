@@ -124,4 +124,18 @@ public class KafkaConsumer {
             log.error("Error processing guest-checked-in: {}", e.getMessage(), e);
         }
     }
+    
+    @KafkaListener(topics = "event-published", groupId = "${spring.application.name}")
+    public void consumeEventPublished(String message) {
+        log.info("Consumed event-published: {}", message);
+        
+        try {
+            JsonNode json = objectMapper.readTree(message);
+            UUID eventId = UUID.fromString(json.get("eventId").asText());
+            
+            analyticsService.handleEventPublished(eventId);
+        } catch (Exception e) {
+            log.error("Error processing event-published: {}", e.getMessage(), e);
+        }
+    }
 }
