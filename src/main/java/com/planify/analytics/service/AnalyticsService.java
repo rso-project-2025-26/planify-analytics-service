@@ -78,6 +78,15 @@ public class AnalyticsService {
     }
     
     @Transactional
+    public void handleEventPublished(UUID eventId) {
+        eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
+            metrics.setEventStatus("PUBLISHED");
+            eventMetricsRepository.save(metrics);
+            log.info("Updated event {} status to PUBLISHED", eventId);
+        });
+    }
+    
+    @Transactional
     public void handleGuestInvited(UUID eventId, UUID userId) {
         eventMetricsRepository.findByEventId(eventId).ifPresent(metrics -> {
             metrics.setTotalInvites(metrics.getTotalInvites() + 1);
