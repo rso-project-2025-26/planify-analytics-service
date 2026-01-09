@@ -1,0 +1,60 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/rso-project-2025-26/planify-analytics-service
+  tag: main
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ghcr-secret
+
+service:
+  type: ClusterIP
+  port: 8084
+  targetPort: 8084
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "512Mi"
+    cpu: "250m"
+
+probes:
+  liveness:
+    path: /actuator/health/liveness
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 100
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+config:
+  springProfilesActive: prod
+  
+  serverPort: "8084"
+  database:
+    url: "jdbc:postgresql://postgres-service:5432/planify"
+    schema: "analytics"
+  kafka:
+    bootstrapServers: "kafka-service:9092"
+    consumerGroup: "analytics-service"
+  
+  jpa:
+    showSql: "false"
+  graphql:
+    graphiqlEnabled: "false"
+  management:
+    endpointsInclude: "health,prometheus,info,metrics"
+  logging:
+    levelRoot: "WARN"
+    levelApp: "INFO"
+    levelSpringWeb: "WARN"
+  swagger:
+    enabled: "false"
