@@ -3,7 +3,7 @@ config:
   jpa:
     showSql: "false"
   graphql:
-    graphiqlEnabled: "false"  
+    graphiqlEnabled: "true"  
   management:
     endpointsInclude: "health,prometheus,info,metrics"
   
